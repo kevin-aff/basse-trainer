@@ -38,6 +38,22 @@ const INLAYS = new Set([3,5,7,9,15,17,19,21]);
 const DBL_INLAYS = new Set([12,24]);
 const CIRCLE_ORDER = [0,7,2,9,4,11,6,1,8,3,10,5]; // C G D A E B F# C# G# D# A# F (quintes)
 
+// Cercle des quintes complet : tonalité majeure, relative mineure, armure (altérations)
+const COF = [
+  {pc:0,  maj:'C',   min:'Am',   acc:'0'},
+  {pc:7,  maj:'G',   min:'Em',   acc:'1♯'},
+  {pc:2,  maj:'D',   min:'Bm',   acc:'2♯'},
+  {pc:9,  maj:'A',   min:'F♯m',  acc:'3♯'},
+  {pc:4,  maj:'E',   min:'C♯m',  acc:'4♯'},
+  {pc:11, maj:'B',   min:'G♯m',  acc:'5♯'},
+  {pc:6,  maj:'G♭',  min:'E♭m',  acc:'6♭ / 6♯'},  // G♭ = F♯ (point enharmonique)
+  {pc:1,  maj:'D♭',  min:'B♭m',  acc:'5♭'},
+  {pc:8,  maj:'A♭',  min:'Fm',   acc:'4♭'},
+  {pc:3,  maj:'E♭',  min:'Cm',   acc:'3♭'},
+  {pc:10, maj:'B♭',  min:'Gm',   acc:'2♭'},
+  {pc:5,  maj:'F',   min:'Dm',   acc:'1♭'},
+];
+
 function pc(n){return ((n%12)+12)%12;}                  // pitch class 0..11
 function noteName(n, flat){return (flat?FLATS:NOTES)[pc(n)];}
 

@@ -225,47 +225,65 @@ function renderTab(){
   renderSummary(map, sel.useFlats);
 }
 
-/* ---- Cercle des quintes ---- */
+/* ---- Cercle des quintes : majeurs + relatives mineures + armures ---- */
 function renderCircle(){
   const svg=$('circle');
-  const cx=160,cy=160,rOut=150,rIn=92;
+  const cx=180, cy=180;
+  const rOut=152, rMajIn=104, rMinIn=58, rAcc=170;
   const N=12, step=2*Math.PI/N;
-  let paths='', labels='';
+  const sel = currentSelection().map;
+
+  const arc=(r0,r1,a0,a1)=>{
+    const x0o=cx+r1*Math.cos(a0), y0o=cy+r1*Math.sin(a0);
+    const x1o=cx+r1*Math.cos(a1), y1o=cy+r1*Math.sin(a1);
+    const x0i=cx+r0*Math.cos(a0), y0i=cy+r0*Math.sin(a0);
+    const x1i=cx+r0*Math.cos(a1), y1i=cy+r0*Math.sin(a1);
+    return `M${x0o},${y0o} A${r1},${r1} 0 0 1 ${x1o},${y1o} L${x1i},${y1i} A${r0},${r0} 0 0 0 ${x0i},${y0i} Z`;
+  };
+
+  let html='';
   for(let i=0;i<N;i++){
-    const p = CIRCLE_ORDER[i];
-    const a0 = -Math.PI/2 + (i-0.5)*step;
-    const a1 = -Math.PI/2 + (i+0.5)*step;
-    const x0o=cx+rOut*Math.cos(a0), y0o=cy+rOut*Math.sin(a0);
-    const x1o=cx+rOut*Math.cos(a1), y1o=cy+rOut*Math.sin(a1);
-    const x0i=cx+rIn*Math.cos(a0), y0i=cy+rIn*Math.sin(a0);
-    const x1i=cx+rIn*Math.cos(a1), y1i=cy+rIn*Math.sin(a1);
-    const isRoot = p===state.rootPc;
-    const inSel = !!currentSelection().map[p];
-    let fill = '#1f242e';
-    if(isRoot) fill='#ff5c7a';
-    else if(inSel) fill='#2f6f4f';
-    paths += `<path class="seg-path" data-pc="${p}" d="M${x0o},${y0o} A${rOut},${rOut} 0 0 1 ${x1o},${y1o} L${x1i},${y1i} A${rIn},${rIn} 0 0 0 ${x0i},${y0i} Z" fill="${fill}" stroke="#0f1115" stroke-width="2"/>`;
-    const am = -Math.PI/2 + i*step;
-    const rl=(rOut+rIn)/2;
-    const lx=cx+rl*Math.cos(am), ly=cy+rl*Math.sin(am)+4;
-    const useFlats = ['F','Bb','Eb','Ab','Db','Gb'].includes(NOTES[p]) && p!==6;
-    labels += `<text data-pc="${p}" x="${lx}" y="${ly}" text-anchor="middle" fill="${isRoot?'#fff':'#e7ecf3'}">${noteName(p,useFlats)}</text>`;
+    const c=COF[i], pcMaj=c.pc, pcMin=pc(c.pc-3);
+    const am=-Math.PI/2 + i*step, a0=am-step/2, a1=am+step/2;
+
+    let majFill='#1f242e';
+    if(state.rootPc===pcMaj) majFill='#ff5c7a';
+    else if(sel[pcMaj]!==undefined) majFill='#2f6f4f';
+    let minFill='#161a21';
+    if(state.rootPc===pcMin) minFill='#3a6ea5';
+    else if(sel[pcMin]!==undefined) minFill='#274a3a';
+
+    html += `<path class="seg-path" data-pc="${pcMaj}" d="${arc(rMajIn,rOut,a0,a1)}" fill="${majFill}" stroke="#0f1115" stroke-width="2"/>`;
+    html += `<path class="seg-path" data-pc="${pcMin}" d="${arc(rMinIn,rMajIn,a0,a1)}" fill="${minFill}" stroke="#0f1115" stroke-width="2"/>`;
+
+    const rMajL=(rOut+rMajIn)/2, rMinL=(rMajIn+rMinIn)/2;
+    const mx=cx+rMajL*Math.cos(am), my=cy+rMajL*Math.sin(am)+5;
+    const nx=cx+rMinL*Math.cos(am), ny=cy+rMinL*Math.sin(am)+4;
+    const ax=cx+rAcc*Math.cos(am), ay=cy+rAcc*Math.sin(am)+4;
+
+    html += `<text data-pc="${pcMaj}" x="${mx}" y="${my}" text-anchor="middle" fill="${state.rootPc===pcMaj?'#fff':'#e7ecf3'}" style="font-size:15px;font-weight:700">${c.maj}</text>`;
+    html += `<text data-pc="${pcMin}" x="${nx}" y="${ny}" text-anchor="middle" fill="${state.rootPc===pcMin?'#fff':'#aeb9c8'}" style="font-size:11px">${c.min}</text>`;
+    html += `<text x="${ax}" y="${ay}" text-anchor="middle" fill="#8893a4" style="font-size:${c.acc.length>2?'9.5':'11'}px">${c.acc}</text>`;
   }
-  labels += `<text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#93a0b4" style="font-size:11px">quintes ↻</text>`;
-  labels += `<text x="${cx}" y="${cy+12}" text-anchor="middle" fill="#93a0b4" style="font-size:11px">quartes ↺</text>`;
-  svg.innerHTML = paths+labels;
+  html += `<text x="${cx}" y="${cy-4}" text-anchor="middle" fill="#93a0b4" style="font-size:11px">quintes ↻</text>`;
+  html += `<text x="${cx}" y="${cy+12}" text-anchor="middle" fill="#93a0b4" style="font-size:11px">quartes ↺</text>`;
+
+  svg.setAttribute('viewBox','0 0 360 360');
+  svg.innerHTML = html;
   svg.querySelectorAll('[data-pc]').forEach(el=>{
     el.style.cursor='pointer';
     el.onclick=()=>{state.rootPc=+el.dataset.pc; $('root').value=String(state.rootPc); render();};
   });
 
-  const fifth = pc(state.rootPc+7), fourth = pc(state.rootPc+5);
-  const rel = pc(state.rootPc-3);
+  const fifth = pc(state.rootPc+7), fourth = pc(state.rootPc+5), rel = pc(state.rootPc-3);
+  const cofEntry = COF.find(c=>c.pc===state.rootPc);
+  const armure = cofEntry ? cofEntry.acc : '—';
   $('circleDetail').innerHTML =
     `<div class="chips">
        <span class="chip">Tonique : <b>${noteName(state.rootPc)}</b></span>
        <span class="chip">Quinte (V) : <b>${noteName(fifth)}</b></span>
        <span class="chip">Quarte (IV) : <b>${noteName(fourth)}</b></span>
        <span class="chip">Rel. mineure : <b>${noteName(rel)}m</b></span>
+       <span class="chip">Armure (majeur) : <b>${armure}</b></span>
      </div>`;
 }

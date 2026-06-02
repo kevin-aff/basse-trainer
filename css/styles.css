@@ -120,7 +120,7 @@ button{cursor:pointer}
 /* Circle of fifths */
 .circle-wrap{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
 svg.circle{max-width:340px;width:100%;height:auto;flex:0 0 auto}
-.circle text{font-size:13px;fill:var(--text);font-weight:600;cursor:pointer;user-select:none}
+.circle text{cursor:pointer;user-select:none}
 .circle .seg-path{cursor:pointer;transition:.12s}
 .circle .seg-path:hover{filter:brightness(1.25)}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
