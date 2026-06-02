@@ -89,7 +89,15 @@ function directedSequence(){
 }
 
 let audioCtx=null, master=null, playTimers=[], playing=false;
+let activeVoices=[];   // voix audio en cours, pour pouvoir tout couper net
 const ksCache = {};
+
+// Garde une référence sur une voix et l'auto-nettoie quand elle se termine
+function trackVoice(node, gain){
+  const v={node, gain};
+  activeVoices.push(v);
+  node.onended = ()=>{ const i=activeVoices.indexOf(v); if(i>=0) activeVoices.splice(i,1); };
+}
 
 function ensureCtx(){
   if(!audioCtx){
@@ -138,6 +146,7 @@ function playBassNote(time, freq){
   g.gain.exponentialRampToValueAtTime(0.85, time+0.006); // attaque rapide (pincé)
   g.gain.exponentialRampToValueAtTime(0.0001, time+1.0); // extinction naturelle
   src.connect(lp).connect(g).connect(master);
+  trackVoice(src, g);
   src.start(time); src.stop(time+1.05);
 }
 function playSynthNote(time, freq){
@@ -147,6 +156,7 @@ function playSynthNote(time, freq){
   g.gain.exponentialRampToValueAtTime(0.4, time+0.012);
   g.gain.exponentialRampToValueAtTime(0.0001, time+0.5);
   o.connect(g).connect(master);
+  trackVoice(o, g);
   o.start(time); o.stop(time+0.55);
 }
 function playNote(time, freq){
@@ -160,6 +170,7 @@ function playClick(time, accent){
   g.gain.exponentialRampToValueAtTime(accent?0.25:0.15, time+0.001);
   g.gain.exponentialRampToValueAtTime(0.0001, time+0.05);
   o.connect(g).connect(master);
+  trackVoice(o, g);
   o.start(time); o.stop(time+0.06);
 }
 function highlightNote(i){
@@ -199,6 +210,18 @@ function startPlayback(){
 function stopPlayback(){
   playing=false;
   playTimers.forEach(clearTimeout); playTimers=[];
+  // coupe net toutes les voix en cours ou programmées (micro-fondu anti-clic)
+  if(audioCtx){
+    const now = audioCtx.currentTime;
+    activeVoices.slice().forEach(v=>{
+      try{
+        v.gain.gain.cancelScheduledValues(now);
+        v.gain.gain.setTargetAtTime(0.0001, now, 0.008); // ~25 ms
+        v.node.stop(now+0.04);
+      }catch(e){}
+    });
+  }
+  activeVoices=[];
   highlightNote(-1);
   updatePlayBtn();
 }
