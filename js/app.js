@@ -18,6 +18,7 @@ const state = {
   octaveOnly:true,
   exercise:'scale_oct_updown',
   pattern:null,        // motif d'exercice spécial (ex. 'oddsEvens'), sinon null
+  sound:'bass',        // 'bass' (corde pincée réaliste) | 'synth'
 };
 
 const $ = id=>document.getElementById(id);
@@ -41,6 +42,7 @@ function syncControls(){
   $('tuning').value = state.tuning;
   $('frets').value = String(state.frets);
   $('direction').value = state.direction;
+  if($('sound')) $('sound').value = state.sound;
   $('bpm').value = state.bpm;
   $('bpmVal').textContent = state.bpm;
   $('modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('active', x.dataset.mode===state.mode));
@@ -92,6 +94,7 @@ function initControls(){
 
   // Transport audio
   $('direction').onchange = e=>{state.direction=e.target.value; render();};
+  $('sound').onchange = e=>{state.sound=e.target.value;};
   $('bpm').oninput = e=>{
     state.bpm=+e.target.value; $('bpmVal').textContent=state.bpm;
     if($('validateBpm')) $('validateBpm').textContent=state.bpm;

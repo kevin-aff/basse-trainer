@@ -88,31 +88,78 @@ function directedSequence(){
   return up;
 }
 
-let audioCtx=null, playTimers=[], playing=false;
+let audioCtx=null, master=null, playTimers=[], playing=false;
+const ksCache = {};
+
 function ensureCtx(){
-  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    // bus principal : compresseur pour éviter la saturation quand les notes se chevauchent
+    master = audioCtx.createDynamicsCompressor();
+    master.threshold.value=-14; master.ratio.value=4;
+    master.attack.value=0.003; master.release.value=0.2;
+    master.connect(audioCtx.destination);
+  }
   return audioCtx;
 }
 const midiToFreq = m => 440*Math.pow(2,(m-69)/12);
 
-function playNote(time, freq){
-  const ctx=audioCtx;
-  const o=ctx.createOscillator(), g=ctx.createGain();
+/* --- Voix de basse réaliste : corde pincée (Karplus–Strong) ---
+   Bruit filtré injecté dans une ligne de retard amortie -> son de corde.
+   Le buffer est mis en cache par hauteur pour rester performant. */
+function ksBuffer(freq){
+  const sr = audioCtx.sampleRate;
+  const key = Math.round(freq*4);
+  if(ksCache[key]) return ksCache[key];
+  const N = Math.max(2, Math.round(sr/freq));
+  const dur = 1.3, total = Math.floor(sr*dur);
+  const buf = audioCtx.createBuffer(1, total, sr);
+  const out = buf.getChannelData(0);
+  const line = new Float32Array(N);
+  let lp = 0;
+  for(let i=0;i<N;i++){ const w=Math.random()*2-1; lp=0.6*lp+0.4*w; line[i]=lp; } // excitation adoucie
+  const R = 0.9955; // amortissement de la corde (sustain)
+  let ptr=0;
+  for(let i=0;i<total;i++){
+    out[i] = line[ptr];
+    line[ptr] = (line[ptr] + line[(ptr+1)%N]) * 0.5 * R; // moyenne = filtre passe-bas + perte
+    ptr = (ptr+1)%N;
+  }
+  ksCache[key] = buf;
+  return buf;
+}
+function playBassNote(time, freq){
+  const src = audioCtx.createBufferSource();
+  src.buffer = ksBuffer(freq);
+  const lp = audioCtx.createBiquadFilter();
+  lp.type='lowpass'; lp.frequency.value=Math.min(2600, freq*7); lp.Q.value=0.6;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.0001, time);
+  g.gain.exponentialRampToValueAtTime(0.85, time+0.006); // attaque rapide (pincé)
+  g.gain.exponentialRampToValueAtTime(0.0001, time+1.0); // extinction naturelle
+  src.connect(lp).connect(g).connect(master);
+  src.start(time); src.stop(time+1.05);
+}
+function playSynthNote(time, freq){
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
   o.type='triangle'; o.frequency.value=freq;
   g.gain.setValueAtTime(0.0001, time);
   g.gain.exponentialRampToValueAtTime(0.4, time+0.012);
   g.gain.exponentialRampToValueAtTime(0.0001, time+0.5);
-  o.connect(g).connect(ctx.destination);
+  o.connect(g).connect(master);
   o.start(time); o.stop(time+0.55);
 }
+function playNote(time, freq){
+  if(state.sound==='synth') playSynthNote(time, freq);
+  else playBassNote(time, freq);
+}
 function playClick(time, accent){
-  const ctx=audioCtx;
-  const o=ctx.createOscillator(), g=ctx.createGain();
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
   o.type='square'; o.frequency.value = accent?2000:1300;
   g.gain.setValueAtTime(0.0001, time);
   g.gain.exponentialRampToValueAtTime(accent?0.25:0.15, time+0.001);
   g.gain.exponentialRampToValueAtTime(0.0001, time+0.05);
-  o.connect(g).connect(ctx.destination);
+  o.connect(g).connect(master);
   o.start(time); o.stop(time+0.06);
 }
 function highlightNote(i){

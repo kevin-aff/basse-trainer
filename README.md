@@ -29,7 +29,8 @@ Ouvrir `index.html` dans un navigateur (double-clic). C'est tout.
   les notes hors octave apparaissent estompées.
 - **Sens de lecture** : montant, descendant, aller-retour.
 - **Audio + métronome** : lecture de la séquence (Web Audio), tempo réglable,
-  métronome, boucle, surlignage synchronisé.
+  métronome, boucle, surlignage synchronisé. Choix du **son** : basse pincée
+  réaliste (synthèse Karplus–Strong) ou synthé.
 - **Accordages** : 4 cordes (E A D G), 5 cordes (B E A D G), Drop D, 5 cordes (E A D G C).
 - **Cercle des quintes / quartes** interactif (clic = nouvelle tonique).
 
