@@ -160,6 +160,7 @@ function playSynthNote(time, freq){
   o.start(time); o.stop(time+0.55);
 }
 function playNote(time, freq){
+  if(state.sound==='none') return;        // notes coupées (le métronome reste géré à part)
   if(state.sound==='synth') playSynthNote(time, freq);
   else playBassNote(time, freq);
 }
@@ -173,11 +174,20 @@ function playClick(time, accent){
   trackVoice(o, g);
   o.start(time); o.stop(time+0.06);
 }
+let currentPlaySeq = [];   // séquence en cours de lecture (pour le highlight manche)
+
 function highlightNote(i){
+  // tablature
   document.querySelectorAll('.tabsvg .tabnote.on').forEach(e=>e.classList.remove('on'));
-  if(i>=0){
-    const el=document.querySelector(`.tabsvg .tabnote[data-i="${i}"]`);
-    if(el) el.classList.add('on');
+  // manche (formes + manche complet)
+  document.querySelectorAll('.dot.lit').forEach(e=>e.classList.remove('lit'));
+  if(i<0) return;
+  const el=document.querySelector(`.tabsvg .tabnote[data-i="${i}"]`);
+  if(el) el.classList.add('on');
+  const n = currentPlaySeq[i];
+  if(n){
+    document.querySelectorAll(`.dot[data-s="${n.s}"][data-f="${n.f}"]`)
+      .forEach(d=>d.classList.add('lit'));
   }
 }
 function updatePlayBtn(){
@@ -203,6 +213,7 @@ function startPlayback(){
   if(playing) return;
   const seq = directedSequence();
   if(seq.length===0) return;
+  currentPlaySeq = seq;
   ensureCtx(); audioCtx.resume();
   playing=true; updatePlayBtn();
   scheduleRun(seq, audioCtx.currentTime+0.12, 60/state.bpm); // 1 note par temps

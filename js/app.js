@@ -113,10 +113,11 @@ function render(){
   const showNeck = state.view==='neck';
   const showForm = state.view==='form' || state.view==='both';
   const showTab  = state.view==='tab'  || state.view==='both';
-  const showTransport = state.view!=='neck';
 
-  $('positionField').style.display = showTransport ? 'flex' : 'none';
-  $('transport').style.display     = showTransport ? 'flex' : 'none';
+  // transport disponible dans toutes les vues (le highlight manche marche aussi en vue Manche)
+  $('transport').style.display     = 'flex';
+  // le sélecteur de position n'a de sens que pour les vues fenêtrées
+  $('positionField').style.display = showNeck ? 'none' : 'flex';
   $('fretboardView').style.display = showNeck ? 'block' : 'none';
   $('formView').style.display      = showForm ? 'block' : 'none';
   $('tabView').style.display       = showTab  ? 'block' : 'none';

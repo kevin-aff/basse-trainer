@@ -28,13 +28,13 @@ function renderFretboard(){
   const {map,useFlats} = currentSelection();
   const strings = TUNINGS[state.tuning].strings; // low -> high
   const nFrets = state.frets;
-  const view = strings.slice().reverse(); // corde aiguë en haut
+  const view = strings.map((open,i)=>({open, s:i})).reverse(); // corde aiguë en haut
 
   let html = '<table class="fretboard"><thead><tr><th></th><th class="fb-open"></th>';
   for(let f=1; f<=nFrets; f++) html += `<th class="fb-fretnum">${f}</th>`;
   html += '</tr></thead><tbody>';
 
-  view.forEach(openNote=>{
+  view.forEach(({open:openNote, s})=>{
     html += `<tr><td class="fb-string-name">${noteName(openNote,useFlats)}</td>`;
     for(let f=0; f<=nFrets; f++){
       const np = pc(openNote+f);
@@ -44,7 +44,7 @@ function renderFretboard(){
       if(hit){
         const role = roleOf(hit.interval);
         const txt = state.showLabels ? noteName(openNote+f,useFlats) : hit.degree;
-        inner = `<div class="dot ${role}">${txt}</div>`;
+        inner = `<div class="dot ${role}" data-s="${s}" data-f="${f}">${txt}</div>`;
       }
       html += `<td class="cell ${open?'openpos':''} ${f===1?'nut':''}">${inner}</td>`;
     }
@@ -131,7 +131,7 @@ function anchorOctave(){
 function renderForm(){
   const {map,useFlats} = currentSelection();
   const t = TUNINGS[state.tuning];
-  const view = t.strings.map((p,i)=>({pc:p, midi:t.midi[i]})).reverse();
+  const view = t.strings.map((p,i)=>({pc:p, midi:t.midi[i], s:i})).reverse();
   const positions = getPositions();
   const pos = positions[Math.min(state.position, positions.length-1)];
   const {start,end} = pos;
@@ -158,7 +158,7 @@ function renderForm(){
         const txt = state.showLabels ? noteName(str.pc+f,useFlats) : hit.degree;
         const cls = hit.interval===0 ? 'formroot' : 'formdeg';
         const faded = state.octaveOnly && (midi<lo || midi>hi) ? ' faded' : '';
-        inner = `<div class="dot ${cls}${faded}">${txt}</div>`;
+        inner = `<div class="dot ${cls}${faded}" data-s="${str.s}" data-f="${f}">${txt}</div>`;
       }
       html += `<td class="cell ${f===0?'openpos':''}">${inner}</td>`;
     }
