@@ -24,6 +24,7 @@ Ouvrir `index.html` dans un navigateur (double-clic). C'est tout.
 - **Vue Position** : forme jouable dans une fenêtre de cases, avec la formule
   d'intervalles (W–W–H…), positions ancrées sur les deux cordes graves.
 - **Vue Tablature** : tablature dessinée, séquence dans l'ordre de jeu.
+- **Vue Forme+Tab** : forme et tablature affichées en même temps.
 - **Mode Octave (1→8)** : limite la séquence/forme à une octave ; en vue Position,
   les notes hors octave apparaissent estompées.
 - **Sens de lecture** : montant, descendant, aller-retour.
@@ -32,10 +33,24 @@ Ouvrir `index.html` dans un navigateur (double-clic). C'est tout.
 - **Accordages** : 4 cordes (E A D G), 5 cordes (B E A D G), Drop D, 5 cordes (E A D G C).
 - **Cercle des quintes / quartes** interactif (clic = nouvelle tonique).
 
+## Entraînement & progression
+
+- **Exercices** : gamme sur une octave (montée / descente / aller-retour),
+  gamme position complète, arpège de triade, et **Odds & Evens** /
+  **Evens & Odds** (parcours par degrés impairs/pairs sur ~2 octaves, toutes cordes).
+- **Validation manuelle** : on règle le tempo, on joue, et on valide le tempo
+  réussi sans erreur.
+- **Tableau de bord** : meilleur tempo validé par configuration, progression vers
+  un objectif (BPM), nombre de validations, dernière session. Export JSON.
+- Données enregistrées **localement** dans le navigateur (`localStorage`).
+
 ## Pile technique
 
 - HTML / CSS / JavaScript pur, sans dépendance ni build.
-- Audio via la Web Audio API.
+- Audio via la Web Audio API ; progression via `localStorage`.
+- Code organisé en modules chargés par `<script>` classiques (compatible `file://`) :
+  `js/engine.js` (théorie), `js/views.js` (rendu), `js/audio.js` (séquence/audio),
+  `js/tracker.js` (suivi), `js/exercises.js` (exercices), `js/app.js` (état/contrôles).
 
 ## Pistes d'évolution
 
