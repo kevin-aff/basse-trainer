@@ -218,21 +218,23 @@ function startPlayback(){
   playing=true; updatePlayBtn();
   scheduleRun(seq, audioCtx.currentTime+0.12, 60/state.bpm); // 1 note par temps
 }
+// Coupe net toutes les voix en cours ou programmées (micro-fondu anti-clic)
+function cutVoices(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  activeVoices.slice().forEach(v=>{
+    try{
+      v.gain.gain.cancelScheduledValues(now);
+      v.gain.gain.setTargetAtTime(0.0001, now, 0.008); // ~25 ms
+      v.node.stop(now+0.04);
+    }catch(e){}
+  });
+  activeVoices=[];
+}
 function stopPlayback(){
   playing=false;
   playTimers.forEach(clearTimeout); playTimers=[];
-  // coupe net toutes les voix en cours ou programmées (micro-fondu anti-clic)
-  if(audioCtx){
-    const now = audioCtx.currentTime;
-    activeVoices.slice().forEach(v=>{
-      try{
-        v.gain.gain.cancelScheduledValues(now);
-        v.gain.gain.setTargetAtTime(0.0001, now, 0.008); // ~25 ms
-        v.node.stop(now+0.04);
-      }catch(e){}
-    });
-  }
-  activeVoices=[];
+  cutVoices();
   highlightNote(-1);
   updatePlayBtn();
 }

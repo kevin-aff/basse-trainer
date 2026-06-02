@@ -134,5 +134,6 @@ function render(){
 /* ---- Démarrage ---- */
 initControls();
 initTraining();
+initQuarters();
 syncControls();
 render();

@@ -45,6 +45,15 @@ Ouvrir `index.html` dans un navigateur (double-clic). C'est tout.
   un objectif (BPM), nombre de validations, dernière session. Export JSON.
 - Données enregistrées **localement** dans le navigateur (`localStorage`).
 
+### Cercle des quartes (mémorisation notes & triades)
+
+- **Play-along** : l'arpège de triade de chaque accord défile autour du cercle
+  des quartes (C→F→B♭→…), dans une **zone de cases réglable**, avec métronome,
+  highlight et auto-avance.
+- **Guidé (toucher)** : pour chaque accord, on touche la fondamentale, la tierce
+  puis la quinte sur le manche (rappel actif), avec score, chrono et record.
+- Triades majeures ou mineures.
+
 ## Pile technique
 
 - HTML / CSS / JavaScript pur, sans dépendance ni build.

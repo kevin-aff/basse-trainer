@@ -136,6 +136,48 @@
     <div id="dashboard"></div>
   </div>
 
+  <!-- CERCLE DES QUARTES : notes & triades -->
+  <div class="panel" id="quartersPanel">
+    <h1 class="train-title">🔄 Cercle des quartes — notes &amp; triades</h1>
+    <div class="row">
+      <div class="seg" id="qModeSeg">
+        <button data-qmode="play" class="active">Play-along</button>
+        <button data-qmode="guided">Guidé (toucher)</button>
+      </div>
+      <div class="field">
+        <label>Qualité</label>
+        <select id="qQuality">
+          <option value="major" selected>Majeure</option>
+          <option value="minor">Mineure</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Zone (cases)</label>
+        <select id="qZone"></select>
+      </div>
+      <div class="field" id="qTempoField">
+        <label>Tempo</label>
+        <div class="bpmrow"><input id="qBpm" type="range" min="40" max="200" value="80"><span><b id="qBpmVal">80</b> BPM</span></div>
+      </div>
+      <div class="toggle" id="qMetroToggle"><div class="switch on" id="qMetro"><div class="knob"></div></div><span>Métronome</span></div>
+      <div class="toggle" id="qAutoToggle"><div class="switch on" id="qAuto"><div class="knob"></div></div><span>Auto-avance</span></div>
+    </div>
+    <div class="q-head">
+      <span class="q-prog" id="qProg"></span>
+      <span class="q-chord" id="qChord"></span>
+      <span class="q-prompt" id="qPrompt"></span>
+    </div>
+    <div id="qBoard"></div>
+    <div class="row" style="margin-top:12px">
+      <button id="qStart" class="playbtn">▶ Démarrer</button>
+      <button id="qPrev">◀ Préc.</button>
+      <button id="qNext">Suiv. ▶</button>
+      <button id="qReveal" style="display:none">Montrer</button>
+      <span class="q-stats" id="qStats"></span>
+    </div>
+    <p class="exercise-desc">Objectif : mémoriser les notes du manche, l'ordre du cercle des quartes et les triades. <b>Play-along</b> : l'arpège de chaque accord défile, joue avec. <b>Guidé</b> : touche la fondamentale, la tierce puis la quinte de chaque accord.</p>
+  </div>
+
   <!-- CERCLE DES QUINTES -->
   <div class="panel">
     <h1 style="font-size:15px;margin-bottom:12px">Cercle des quintes / quartes</h1>
@@ -157,6 +199,7 @@
 <script src="js/audio.js"></script>
 <script src="js/tracker.js"></script>
 <script src="js/exercises.js"></script>
+<script src="js/quarters.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
