@@ -184,8 +184,9 @@ function renderTab(){
   const strings = TUNINGS[state.tuning].strings;
   const nS = strings.length;
   const seq = directedSequence(); // défini dans audio.js
+  const hasDeg = seq.some(n=>n.degree!=null); // degrés fournis par les exercices Odds/Evens
 
-  const mL=44, mR=26, mT=24, mB=24, gap=26, dx=48;
+  const mL=44, mR=26, mT=24, mB=hasDeg?44:24, gap=26, dx=48;
   const W = mL + mR + Math.max(1, seq.length-1)*dx;
   const H = mT + mB + (nS-1)*gap;
   const yOf = s => mT + (nS-1-s)*gap;
@@ -206,6 +207,18 @@ function renderTab(){
     svg += `<text x="${x}" y="${y+5}" text-anchor="middle" fill="#e7ecf3" font-size="14" font-family="ui-monospace,monospace" font-weight="600">${txt}</text>`;
     svg += `</g>`;
   });
+
+  // Rangée des degrés sous la tablature (exercices Odds/Evens)
+  if(hasDeg){
+    const yd = yOf(0) + 30;
+    svg += `<line x1="${mL-10}" y1="${yd-16}" x2="${W-8}" y2="${yd-16}" stroke="#2a3140" stroke-width="1"/>`;
+    svg += `<text x="8" y="${yd}" fill="#93a0b4" font-size="11" font-family="ui-monospace,monospace">deg</text>`;
+    seq.forEach((n,i)=>{
+      if(n.degree==null) return;
+      const x = mL + i*dx;
+      svg += `<text x="${x}" y="${yd}" text-anchor="middle" fill="#4cc2ff" font-size="12" font-weight="700" font-family="ui-monospace,monospace">${n.degree}</text>`;
+    });
+  }
   svg += `</svg>`;
 
   $('tabView').innerHTML = `<div class="tab-scroll">${svg}</div>`;
