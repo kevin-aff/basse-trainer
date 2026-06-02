@@ -13,6 +13,13 @@
     <span class="sub">Manche · Gammes · Triades · Entraînement · Cercle des quintes</span>
   </header>
 
+  <nav class="tabs" id="mainTabs">
+    <button data-tab="visu" class="active">🎸 Visualisation</button>
+    <button data-tab="train">🎯 Entraînement</button>
+    <button data-tab="circle">🔄 Cercle</button>
+  </nav>
+
+  <div class="tabpage" data-tab="visu">
   <!-- MODE + INSTRUMENT -->
   <div class="panel">
     <div class="row">
@@ -80,7 +87,7 @@
     <div id="tabView" style="display:none"></div>
 
     <div id="transport" class="transport" style="display:none">
-      <button id="playBtn" class="playbtn">▶ Lecture</button>
+      <button id="playBtn" class="playbtn js-play">▶ Lecture</button>
       <div class="field">
         <label>Sens</label>
         <select id="direction">
@@ -91,7 +98,7 @@
       </div>
       <div class="field">
         <label>Tempo</label>
-        <div class="bpmrow"><input id="bpm" type="range" min="40" max="220" value="80"><span><b id="bpmVal">80</b> BPM</span></div>
+        <div class="bpmrow"><input id="bpm" class="js-bpm" type="range" min="40" max="220" value="80"><span><b id="bpmVal" class="js-bpmval">80</b> BPM</span></div>
       </div>
       <div class="field">
         <label>Son</label>
@@ -102,7 +109,7 @@
         </select>
       </div>
       <div class="toggle"><div class="switch on" id="swOctave"><div class="knob"></div></div><span>Octave (1→8)</span></div>
-      <div class="toggle"><div class="switch on" id="swMetro"><div class="knob"></div></div><span>Métronome</span></div>
+      <div class="toggle"><div class="switch on js-metro" id="swMetro"><div class="knob"></div></div><span>Métronome</span></div>
       <div class="toggle"><div class="switch" id="swLoop"><div class="knob"></div></div><span>Boucle</span></div>
     </div>
     <div class="legend">
@@ -113,6 +120,9 @@
     </div>
   </div>
 
+  </div><!-- /tab visu -->
+
+  <div class="tabpage" data-tab="train" style="display:none">
   <!-- ENTRAÎNEMENT & PROGRESSION -->
   <div class="panel train">
     <h1 class="train-title">🎯 Entraînement &amp; progression</h1>
@@ -128,6 +138,15 @@
       </div>
     </div>
     <p class="exercise-desc" id="exerciseDesc"></p>
+    <div class="train-transport">
+      <button id="trainPlay" class="playbtn js-play">▶ Lecture</button>
+      <div class="field">
+        <label>Tempo</label>
+        <div class="bpmrow"><input class="js-bpm" id="trainBpm" type="range" min="40" max="220" value="80"><span><b class="js-bpmval">80</b> BPM</span></div>
+      </div>
+      <div class="toggle"><div class="switch on js-metro" id="trainMetro"><div class="knob"></div></div><span>Métronome</span></div>
+      <span class="info" style="align-self:center">Joue avec, puis valide ton tempo ci-dessous. La forme/tablature est dans l'onglet Visualisation.</span>
+    </div>
     <div class="validate-row">
       <button id="validateBtn" class="validatebtn">✓ Validé sans erreur à <b id="validateBpm">80</b> BPM</button>
       <div class="record" id="recordInfo"></div>
@@ -136,6 +155,9 @@
     <div id="dashboard"></div>
   </div>
 
+  </div><!-- /tab train -->
+
+  <div class="tabpage" data-tab="circle" style="display:none">
   <!-- CERCLE DES QUARTES : notes & triades -->
   <div class="panel" id="quartersPanel">
     <h1 class="train-title">🔄 Cercle des quartes — notes &amp; triades</h1>
@@ -190,6 +212,8 @@
       </div>
     </div>
   </div>
+
+  </div><!-- /tab circle -->
 
   <footer>Basse Trainer · prototype local — aucune donnée envoyée. Progression enregistrée dans ce navigateur.</footer>
 </div>

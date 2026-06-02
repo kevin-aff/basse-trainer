@@ -23,6 +23,34 @@ const state = {
 
 const $ = id=>document.getElementById(id);
 
+// Synchronise tempo et métronome entre le lecteur principal et le mini-lecteur (onglet Entraînement)
+function setBpm(v){
+  state.bpm = v;
+  document.querySelectorAll('.js-bpm').forEach(i=>{ if(+i.value!==v) i.value=v; });
+  document.querySelectorAll('.js-bpmval').forEach(s=>s.textContent=v);
+  if($('validateBpm')) $('validateBpm').textContent=v;
+}
+function setMetro(v){
+  state.metronome = v;
+  document.querySelectorAll('.js-metro').forEach(sw=>sw.classList.toggle('on', v));
+}
+
+/* ---- Onglets ---- */
+let currentTab = 'visu';
+function showTab(name){
+  if(name===currentTab) return;
+  if(currentTab==='circle') qStopAll();   // quitte le cercle : stoppe son lecteur
+  if(name==='circle') stopPlayback();      // entre dans le cercle : stoppe le lecteur de gammes
+  currentTab = name;
+  document.querySelectorAll('.tabpage').forEach(p=>{
+    p.style.display = (p.dataset.tab===name) ? 'block' : 'none';
+  });
+  document.querySelectorAll('#mainTabs button').forEach(b=>b.classList.toggle('active', b.dataset.tab===name));
+}
+function initTabs(){
+  document.querySelectorAll('#mainTabs button').forEach(b=>{ b.onclick=()=>showTab(b.dataset.tab); });
+}
+
 function fillSelect(el, entries, selected){
   el.innerHTML='';
   entries.forEach(([val,label])=>{
@@ -43,15 +71,14 @@ function syncControls(){
   $('frets').value = String(state.frets);
   $('direction').value = state.direction;
   if($('sound')) $('sound').value = state.sound;
-  $('bpm').value = state.bpm;
-  $('bpmVal').textContent = state.bpm;
+  setBpm(state.bpm);
   $('modeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('active', x.dataset.mode===state.mode));
   $('viewSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('active', x.dataset.view===state.view));
   $('scaleField').style.display = state.mode==='scale' ? 'flex' : 'none';
   $('triadField').style.display = state.mode==='triad' ? 'flex' : 'none';
   $('swLabels').classList.toggle('on', state.showLabels);
   $('swLabelsTxt').textContent = state.showLabels ? 'Notes' : 'Degrés';
-  $('swMetro').classList.toggle('on', state.metronome);
+  setMetro(state.metronome);
   $('swLoop').classList.toggle('on', state.loop);
   $('swOctave').classList.toggle('on', state.octaveOnly);
 }
@@ -92,15 +119,12 @@ function initControls(){
 
   $('position').onchange = e=>{state.position=+e.target.value; render();};
 
-  // Transport audio
+  // Transport audio (lecteur principal + mini-lecteur de l'onglet Entraînement, synchronisés)
   $('direction').onchange = e=>{state.direction=e.target.value; render();};
   $('sound').onchange = e=>{state.sound=e.target.value;};
-  $('bpm').oninput = e=>{
-    state.bpm=+e.target.value; $('bpmVal').textContent=state.bpm;
-    if($('validateBpm')) $('validateBpm').textContent=state.bpm;
-  };
-  $('playBtn').onclick = ()=>{ playing ? stopPlayback() : startPlayback(); };
-  $('swMetro').onclick  = ()=>{state.metronome=!state.metronome; $('swMetro').classList.toggle('on',state.metronome);};
+  document.querySelectorAll('.js-bpm').forEach(i=>{ i.oninput = e=>setBpm(+e.target.value); });
+  document.querySelectorAll('.js-play').forEach(b=>{ b.onclick = ()=>{ playing ? stopPlayback() : startPlayback(); }; });
+  document.querySelectorAll('.js-metro').forEach(sw=>{ sw.onclick = ()=>setMetro(!state.metronome); });
   $('swLoop').onclick   = ()=>{state.loop=!state.loop; $('swLoop').classList.toggle('on',state.loop);};
   $('swOctave').onclick = ()=>{state.octaveOnly=!state.octaveOnly; $('swOctave').classList.toggle('on',state.octaveOnly); render();};
 }
@@ -135,5 +159,6 @@ function render(){
 initControls();
 initTraining();
 initQuarters();
+initTabs();
 syncControls();
 render();

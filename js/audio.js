@@ -191,9 +191,10 @@ function highlightNote(i){
   }
 }
 function updatePlayBtn(){
-  const b=$('playBtn');
-  b.textContent = playing ? '⏹ Stop' : '▶ Lecture';
-  b.classList.toggle('playing', playing);
+  document.querySelectorAll('.js-play').forEach(b=>{
+    b.textContent = playing ? '⏹ Stop' : '▶ Lecture';
+    b.classList.toggle('playing', playing);
+  });
 }
 function scheduleRun(seq, t0, spb){
   seq.forEach((n,i)=>{

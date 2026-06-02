@@ -10,6 +10,14 @@ aucune installation, hors-ligne), avec un objectif de **portage smartphone** ult
 
 Ouvrir `index.html` dans un navigateur (double-clic). C'est tout.
 
+## Organisation (3 onglets)
+
+1. **Visualisation** — options de gammes / notes / triades, affichage du manche
+   (manche, position, tablature, forme+tab) et lecteur.
+2. **Entraînement** — choix d'exercice, mini-lecteur (tempo/métronome synchronisés),
+   validation du tempo et tableau de bord de progression.
+3. **Cercle** — cercle des quartes (mémorisation) et cercle des quintes complet.
+
 ## Fonctionnalités
 
 - **Manche complet** : visualisation de toute la touche.
